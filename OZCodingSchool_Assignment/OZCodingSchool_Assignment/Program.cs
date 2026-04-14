@@ -6,115 +6,79 @@ using System.Threading.Tasks;
 
 namespace OZCodingSchool_Assignment
 {
-    public enum MusicType
+    internal class Program
     {
-        None = 0,
-        Jazz = 101,
-        Pop = 201,
-        KPop = 202,
-        JPop = 203,
-        Rock = 301,
-        Metal = 302,
-        HipHop = 401,
-        HardCore = 501,
-        ArtCore = 502,
-
-    }
-
-    public class Music
-    {
-        protected string m_name;
-        protected MusicType m_type;
-
-        public Music(string name)
+        static void Main(string[] agrs)
         {
-            m_name = name;
-            m_type = MusicType.None;
+            List<string> text = new List<string>();
+
+            text.Add("0번");
+            text.Add("1번");
+            text.Add("3번인 척 하는 2번");
+
+            Console.WriteLine(text[0]);
+            Console.WriteLine(text[1]);
+            Console.WriteLine(text[2]);
+
+            Dictionary<int, string> textTwo = new Dictionary<int, string>();
+
+            textTwo.Add(1, "1번");
+            textTwo.Add(2, "2번");
+            textTwo.Add(50, "50번");
+            textTwo.Add(3, "이번엔 진짜 3번");
+
+            Console.WriteLine(textTwo[1]);
+            Console.WriteLine(textTwo[3]);
+            Console.WriteLine(textTwo[50]);
+
+            Queue<string> textThree = new Queue<string>();
+
+            textThree.Enqueue("1번");
+            textThree.Enqueue("2번");
+            textThree.Enqueue("3번");
+            textThree.Enqueue("나 3번인가?!");
+
+            textThree.Dequeue();
+            textThree.Dequeue();
+
+            Console.WriteLine($"과연 누가 나올까? 정답은 {textThree.Dequeue()}!");
+
+            Stack<string> textFour = new Stack<string>();
+
+            textFour.Push(textThree.Dequeue());
+            textFour.Push("새로운 1번");
+            textFour.Push("새로운 2번");
+            textFour.Push("새로운 3번");
+
+            textFour.Pop();
+            textFour.Pop();
+            textFour.Pop();
+
+            Console.WriteLine($"과연 누가 나올까? 설마 이번에도... {textFour.Pop()}");
+
+            HashSet<string> textFive = new HashSet<string>();
+
+            textFive.Add("1");
+            textFive.Add("2");
+            textFive.Add("3");
+            bool isIn = textFive.Add("2");
+
+            Console.WriteLine();
+
+            Console.WriteLine("과연 textFive.Add(\"2\")는 들어갔을까?");
+
+            if (isIn)
+            {
+                Console.WriteLine("들어갔네!");
+            }
+            else if (isIn == false)
+            {
+                Console.WriteLine("아니네!");
+            }
+
+            Console.WriteLine($"그렇다면 textFive의 데이터 총 개수는? {textFive.Count}개!");
+
         }
 
-        public virtual void Play()
-        {
-            Console.WriteLine($"당신은 {m_type} 장르의 {m_name}을 들었다!!");
-        }
-
-    }
-
-    public class Jazz : Music
-    {
-
-        public Jazz(string name) : base(name)
-        {
-            m_type = MusicType.Jazz;
-        }
-
-        public override void Play()
-        {
-            base.Play();
-        }
-
-    }
-
-    public class Pop : Music
-    {
-        public Pop(string name) : base(name)
-        {
-            m_type = MusicType.Pop;
-        }
-
-        public override void Play()
-        {
-            base.Play();
-            Console.WriteLine("당신은 잔잔한 팝송을 듣고 마음이 편안해졌다!!");
-        }
-
-    }
-
-    public class Rock : Music
-    {
-        public Rock(string name) : base(name)
-        {
-            m_type = MusicType.Rock;
-        }
-
-        public override void Play()
-        {
-            base.Play();
-            Console.WriteLine("당신은 일렉기타의 소리에 의해서 마음이 흥분되기 시작했다!!");
-        }
-
-    }
-
-    public class ArtCore : Music
-    {
-        public ArtCore(string name) : base(name)
-        {
-            m_type = MusicType.ArtCore;
-        }
-
-        public override void Play()
-        {
-            base.Play();
-            Console.WriteLine("당신은 기분이 좋아졌다!!");
-        }
-
-    }
-
-    internal class LeeKiWoong
-    {
-        static void Main(string[] leekiwoong)
-        {
-
-            ArtCore artCore = new ArtCore("Orchid");
-            artCore.Play();
-
-            Music pop = new Pop("set fire to the rain");
-            pop.Play();
-
-            Pop realpop = pop as Pop;
-
-            realpop.Play();
-
-
-        }
     }
 }
