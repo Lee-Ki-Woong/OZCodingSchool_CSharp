@@ -6,654 +6,143 @@ using System.Threading.Tasks;
 
 namespace OZCodingSchool_Assignment
 {
-    internal enum ItemGrade
+    public enum MonsterType
     {
         None = 0,
-        Normal = 1,
-        Rare = 2,
-        Unique = 3,
-        Epic = 4,
+        Slime = 1,
+        Wolf = 2,
+        Troll = 3,
+        Orc = 4,
+        Ogre = 5,
+        BossMonster = 101,
     }
 
-    internal enum ItemType
+    public enum MapType
     {
         None = 0,
-        Weapon = 1,
-        Armour = 2,
-        ETC = 3,
+        Forest = 1,
+        IceLand = 2,
+        Volcano = 3,
+        Jungle = 4,
     }
 
-    internal enum WeaponType
-    {
-        None = 0,
-        Sword = 1,
-        Bow = 2,
-        Wand = 3,
-    }
-
-    internal enum ArmourType
-    {
-        None = 0,
-        LightArmour = 1,
-        Leather = 2,
-        Cloth = 3,
-    }
-
-    internal enum MenuType
-    {
-        None = 0,
-        MainMenu = 1,
-        ItemCategory = 2,
-        WeaponAttack = 3,
-        MyInventory = 4,
-        Exit = 5,
-        WeaponCategory = 6,
-        ArmourCategory = 7,
-        ETCCategory = 8,
-        SwordCategory = 9,
-        BowCategory = 10,
-    }
-
-
-
-
-    internal class Item
+    internal class Monster
     {
         public string m_name { get; protected set; }
-        public ItemGrade m_ItemGrade { get; protected set; }
-        public string m_itemInfo { get; protected set; }
+        public MonsterType m_monsterType { get; protected set; }
+        public MapType m_mapType { get; protected set; }
 
-        public Item(string name, ItemGrade ItemGrade, string itemInfo)
+        public Monster(string name, MapType mapType)
         {
             m_name = name;
-            m_ItemGrade = ItemGrade;
-            m_itemInfo = itemInfo;
+            m_monsterType = MonsterType.None;
+            m_mapType = mapType;
         }
 
-
+        public virtual void Info()
+        {
+            Console.WriteLine("버그 방지를 위한 텍스트! 발견한다면 즉시 신고데스크에 신고해주세요.");
+        }
     }
 
-
-
-    internal class EquipItem : Item
+    internal class Slime : Monster
     {
-        public EquipItem(string name, ItemGrade ItemGrade, string itemInfo) : base(name, ItemGrade, itemInfo)
+        public Slime(string name, MapType mapType) : base(name, mapType)
         {
-
+            m_monsterType = MonsterType.Slime;
         }
 
+        public override void Info()
+        {
+            Console.WriteLine("원소의 기운이 모여 젤리형태로 변환된 몬스터이다. 만지면 말랑말랑하다");
+        }
     }
 
-
-
-    internal class Weapon : EquipItem
+    internal class Wolf : Monster
     {
-        public WeaponType m_weaponType { get; protected set; }
-        public int m_attackDamage { get; protected set; }
-
-        public Weapon(string name, ItemGrade ItemGrade, string itemInfo, int attackDamage) : base(name, ItemGrade, itemInfo)
+        public Wolf(string name, MapType mapType) : base(name, mapType)
         {
-            m_weaponType = WeaponType.None;
-            m_attackDamage = attackDamage;
+            m_monsterType = MonsterType.Wolf;
         }
 
-        public virtual void Attack()
+        public override void Info()
         {
-            Console.WriteLine($"{m_name}으로 공격!! {m_attackDamage}만큼의 피해를 입혔다!");
+            Console.WriteLine("사람의 손길이 닿지 않는 구역을 떠돌아 다니는 몬스터이다. 행동이 매우 재빠르며, 날카로운 송곳니는 치명적일 수 있다.");
         }
-
     }
 
-    internal class Sword : Weapon
+    internal class Troll : Monster
     {
-        public Sword(string name, ItemGrade ItemGrade, string itemInfo, int attackDamage) : base(name, ItemGrade, itemInfo, attackDamage)
+        public Troll(string name, MapType mapType) : base(name, mapType)
         {
-            m_weaponType = WeaponType.Sword;
+            m_monsterType = MonsterType.Troll;
         }
 
-        public override void Attack()
+        public override void Info()
         {
-            Console.WriteLine($"{m_name}으로 베기 공격!! {m_attackDamage}만큼의 피해를 입혔다!");
+            Console.WriteLine("부족 사회를 이루어 살아가며, 사람보단 못하지만 지성이 어느 정도 있는 몬스터이다. 트롤이 한 마리라도 근처에 보인다면 트롤 부족이나 트롤 무리가 주변에 있을 가능성이 매우 높으니 주의하자!!");
         }
     }
 
-    internal class Bow : Weapon
+    internal class Orc : Monster
     {
-        public Bow(string name, ItemGrade ItemGrade, string itemInfo, int attackDamage) : base(name, ItemGrade, itemInfo, attackDamage)
+        public Orc(string name, MapType mapType) : base(name, mapType)
         {
-            m_weaponType = WeaponType.Bow;
+            m_monsterType = MonsterType.Orc;
         }
-        public override void Attack()
+
+        public override void Info()
         {
-            Console.WriteLine($"{m_name}으로 화살 발사!! {m_attackDamage}만큼의 피해를 입혔다!");
-        }
-    }
-
-
-
-    internal class Armour : EquipItem
-    {
-        public ArmourType m_armourType { get; protected set; }
-        public int m_armourPoint { get; protected set; }
-
-        public Armour(string name, ItemGrade ItemGrade, string itemInfo, int armourPoint) : base(name, ItemGrade, itemInfo)
-        {
-            m_armourType = ArmourType.None;
-            m_armourPoint = armourPoint;
+            Console.WriteLine("커다란 덩치를 가지고 있으며, 힘이 매우 센 몬스터이다. 기초적인 사고를 할 줄 알아 무리가 많을 땐 멀리서 지켜보지만, 혼자 있을 경우 만만하다고 생각해 공격을 하니 혼자 있다면 각별히 조심을 해야 한다.");
         }
 
     }
-
-    internal class LightArmour : Armour
-    {
-        public LightArmour(string name, ItemGrade ItemGrade, int armourPoint, string itemInfo) : base(name, ItemGrade, itemInfo, armourPoint)
-        {
-            m_armourType = ArmourType.LightArmour;
-        }
-
-    }
-
-    internal class Leather : Armour
-    {
-        public Leather(string name, ItemGrade ItemGrade, int armourPoint, string itemInfo) : base(name, ItemGrade, itemInfo, armourPoint)
-        {
-            m_armourType = ArmourType.Leather;
-        }
-
-    }
-
-    internal class Cloth : Armour
-    {
-        public Cloth(string name, ItemGrade ItemGrade, int armourPoint, string itemInfo) : base(name, ItemGrade, itemInfo, armourPoint)
-        {
-            m_armourType = ArmourType.Cloth;
-        }
-
-    }
-
-
-
-    internal class ETC : Item
-    {
-        internal ETC(string name, ItemGrade ItemGrade, string itemInfo) : base(name, ItemGrade, itemInfo)
-        {
-
-        }
-
-    }
-
-
-
-    internal class ItemList
-    {
-        public static List<Item> m_swordList = new List<Item>
-        {
-            new Sword("검", ItemGrade.Normal, "평범한 검이다.", 50),
-            new Sword("강철 검", ItemGrade.Rare, "강철로 만들어진 검이다.", 100),
-            new Sword("장인이 만든 검", ItemGrade.Unique, "한 장인이 삼일 밤낮을 두드려 만들어낸 검이다.", 200),
-        };
-
-        public static List<Item> m_bowList = new List<Item>
-        {
-            new Bow("활", ItemGrade.Normal, "평범한 활이다.", 50),
-            new Bow("강철 활", ItemGrade.Rare, "강철로 만든 활이다.", 100),
-            new Bow("장인이 만든 활", ItemGrade.Unique, "장인이 고품질의 목재와 끈을 가지고 만들어낸 활이다.", 200),
-        };
-
-        public static List<Item> m_etcList = new List<Item>
-        {
-            new ETC("나뭇잎", ItemGrade.None, "나무에서 떨어져버린 나뭇잎이다."),
-            new ETC("강철", ItemGrade.Rare, "매우 단단한 금속이다."),
-            new ETC("다이아몬드", ItemGrade.Unique, "경도가 높은 결정체이다. 필요에 따라 보석이나 고품질의 장비를 제작할 수 있다."),
-        };
-
-    }
-
-
-
-    internal class Menu
-    {
-        public MenuType m_menu { get; private set; } = MenuType.MainMenu;
-
-
-        public void MenuList()
-        {
-            List<Item> myInventory = new List<Item>();
-
-            while (true)
-            {
-                switch (m_menu)
-                {
-                    case MenuType.MainMenu:
-                        {
-                            UI.HeadLine("메뉴");
-                            UI.ChoiceLine("아이템 정보 및 인벤토리에 담기", "무기 휘둘러보기", "인벤토리 확인하기", "종료");
-                            m_menu = IOChecker.MainMenuChoice(Console.ReadLine());
-                        }
-                        break;
-                    case MenuType.ItemCategory:
-                        {
-                            UI.HeadLine("아이템 카테고리");
-                            UI.ChoiceLine("무기", "기타", "뒤로가기");
-                            m_menu = IOChecker.ItemCategoryChoice(Console.ReadLine());
-                        }
-                        break;
-                    case MenuType.WeaponAttack:
-                        {
-                            UI.WeaponAttack(myInventory);
-                            m_menu = MenuType.MainMenu;
-                        }
-                        break;
-                    case MenuType.MyInventory:
-                        {
-                            UI.ShowInventory(myInventory);
-                            m_menu = MenuType.MainMenu;
-                        }
-                        break;
-                    case MenuType.Exit:
-                        {
-                            return;
-                        }
-                    case MenuType.WeaponCategory:
-                        {
-                            UI.HeadLine("무기 타입");
-                            UI.ChoiceLine("검", "활", "뒤로가기");
-                            m_menu = IOChecker.WeaponCategoryChoice(Console.ReadLine());
-
-                        }
-                        break;
-                    case MenuType.ArmourCategory:
-                        {
-                            UI.HeadLine("방어구 타입");
-                            UI.ChoiceLine("천", "가죽", "경갑", "뒤로가기"); // 미완성
-                        }
-                        break;
-                    case MenuType.ETCCategory:
-                        {
-                            UI.HeadLine("기타 아이템");
-                            UI.ChoiceLine("나뭇잎", "강철", "다이아몬드", "뒤로가기");
-                            m_menu = IOChecker.ETCCategoryChoice(Console.ReadLine(), myInventory);
-
-                        }
-                        break;
-                    case MenuType.SwordCategory:
-                        {
-                            UI.HeadLine("검");
-                            UI.ChoiceLine("검", "강철 검", "장인이 만든 검", "뒤로가기");
-                            m_menu = IOChecker.SwordCategoryChoice(Console.ReadLine(), myInventory);
-                        }
-                        break;
-                    case MenuType.BowCategory:
-                        {
-                            UI.HeadLine("활");
-                            UI.ChoiceLine("활", "강철 활", "장인이 만든 활", "뒤로가기");
-                            m_menu = IOChecker.BowCategoryChoice(Console.ReadLine(), myInventory);
-                        }
-                        break;
-                }
-            }
-        }
-    }
-
-    internal class UI
-    {
-        public static void HeadLine(string text)
-        {
-            Console.WriteLine($"원하는 {text}를(을) 선택하여 주십시오.");
-        }
-
-        public static void ChoiceLine(string textOne, string textTwo)
-        {
-            Console.WriteLine($"1. {textOne} // 2. {textTwo}");
-        }
-
-        public static void ChoiceLine(string textOne, string textTwo, string textThree)
-        {
-            Console.WriteLine($"1. {textOne} // 2. {textTwo} // 3. {textThree}");
-        }
-
-        public static void ChoiceLine(string textOne, string textTwo, string textThree, string textFour)
-        {
-            Console.WriteLine($"1. {textOne} // 2. {textTwo} // 3. {textThree} // 4. {textFour}");
-        }
-
-        public static void ShowInventory(List<Item> myinventory)
-        {
-            int i = 0;
-            Console.Clear();
-            Console.WriteLine($"소지하고 있는 아이템 개수 = {myinventory.Count}개");
-
-            foreach (Item item in myinventory)
-            {
-                i++;
-
-                Console.WriteLine($"슬롯 {i}번");
-                Console.WriteLine($"아이템 이름 : {item.m_name}");
-                Console.WriteLine($"아이템 정보 : {item.m_itemInfo}");
-            }
-
-            Console.ReadKey();
-        }
-
-        public static void ShowItem(Item item)
-        {
-            Console.Write($"이름: {item.m_name}");
-
-            if (item is Weapon)
-            {
-                Weapon weapon = (Weapon)item;
-                Console.WriteLine($"공격력 : {weapon.m_attackDamage}");
-            }
-
-            if (item is Armour)
-            {
-                Armour armour = (Armour)item;
-                Console.WriteLine($"방어력 : {armour.m_armourPoint}");
-
-            }
-
-            Console.Write($"정보: {item.m_name}");
-
-        }
-
-        public static void WeaponAttack(List<Item> myinventory)
-        {
-            Console.Clear();
-
-            int i = 0;
-
-            foreach (Item item in myinventory)
-            {
-                if (item is Weapon)
-                {
-                    i++;
-                    Console.Write($"{i}번째 무기 ");
-                    Weapon weapon = (Weapon)item;
-                    weapon.Attack();
-                }
-            }
-
-            Console.ReadKey();
-        }
-
-        public static void ChoiceMunber(string text)
-        {
-            Console.WriteLine($"{text} 개수를 입력하여 주십시오.");
-        }
-
-    }
-
-    internal class IOChecker
-    {
-        public static MenuType MainMenuChoice(string choice)
-        {
-            switch (choice)
-            {
-                case "1":
-                    {
-                        return MenuType.ItemCategory;
-                    }
-                case "2":
-                    {
-                        return MenuType.WeaponAttack;
-                    }
-                case "3":
-                    {
-                        return MenuType.MyInventory;
-                    }
-                case "4":
-                    {
-                        return MenuType.Exit;
-                    }
-                default:
-                    {
-                        return MenuType.MainMenu;
-                    }
-
-            }
-
-        }
-
-        public static MenuType ItemCategoryChoice(string choice)
-        {
-            switch (choice)
-            {
-                case "1":
-                    {
-                        return MenuType.WeaponCategory;
-                    }
-                case "2":
-                    {
-                        return MenuType.ETCCategory;
-                    }
-                case "3":
-                    {
-                        return MenuType.MainMenu;
-                    }
-                default:
-                    {
-                        return MenuType.ItemCategory;
-                    }
-
-            }
-
-        }
-
-        public static MenuType WeaponCategoryChoice(string choice)
-        {
-            switch (choice)
-            {
-                case "1":
-                    {
-                        return MenuType.SwordCategory;
-                    }
-                case "2":
-                    {
-                        return MenuType.BowCategory;
-                    }
-                case "3":
-                    {
-                        return MenuType.WeaponCategory;
-                    }
-                default:
-                    {
-                        return MenuType.ItemCategory;
-                    }
-
-            }
-        }
-
-        public static MenuType ETCCategoryChoice(string choice, List<Item> myinventory)
-        {
-            switch (choice)
-            {
-                case "1":
-                    {
-                        GetItem.GetItemName(choice);
-                        GetItem.GetItemNumber();
-                        GetItem.GetItemInInventory(myinventory);
-                        return MenuType.MainMenu;
-                    }
-                case "2":
-                    {
-                        GetItem.GetItemName(choice);
-                        GetItem.GetItemNumber();
-                        GetItem.GetItemInInventory(myinventory);
-                        return MenuType.MainMenu;
-                    }
-                case "3":
-                    {
-                        GetItem.GetItemName(choice);
-                        GetItem.GetItemNumber();
-                        GetItem.GetItemInInventory(myinventory);
-                        return MenuType.MainMenu;
-                    }
-                case "4":
-                    {
-                        return MenuType.ItemCategory;
-                    }
-                default:
-                    {
-                        return MenuType.ETCCategory;
-                    }
-
-            }
-        }
-
-        public static MenuType SwordCategoryChoice(string choice, List<Item> myinventory)
-        {
-            switch (choice)
-            {
-                case "1":
-                    {
-                        GetItem.GetItemName(choice, WeaponType.Sword);
-                        GetItem.GetItemNumber();
-                        GetItem.GetItemInInventory(myinventory);
-                        return MenuType.MainMenu;
-                    }
-                case "2":
-                    {
-                        GetItem.GetItemName(choice, WeaponType.Sword);
-                        GetItem.GetItemNumber();
-                        GetItem.GetItemInInventory(myinventory);
-                        return MenuType.MainMenu;
-                    }
-                case "3":
-                    {
-                        GetItem.GetItemName(choice, WeaponType.Sword);
-                        GetItem.GetItemNumber();
-                        GetItem.GetItemInInventory(myinventory);
-                        return MenuType.MainMenu;
-                    }
-                case "4":
-                    {
-                        return MenuType.WeaponCategory;
-                    }
-                default:
-                    {
-                        return MenuType.SwordCategory;
-                    }
-            }
-        }
-
-        public static MenuType BowCategoryChoice(string choice, List<Item> myinventory)
-        {
-            switch (choice)
-            {
-                case "1":
-                    {
-                        GetItem.GetItemName(choice, WeaponType.Bow);
-                        GetItem.GetItemNumber();
-                        GetItem.GetItemInInventory(myinventory);
-                        return MenuType.MainMenu;
-                    }
-                case "2":
-                    {
-                        GetItem.GetItemName(choice, WeaponType.Bow);
-                        GetItem.GetItemNumber();
-                        GetItem.GetItemInInventory(myinventory);
-                        return MenuType.MainMenu;
-                    }
-                case "3":
-                    {
-                        GetItem.GetItemName(choice, WeaponType.Bow);
-                        GetItem.GetItemNumber();
-                        GetItem.GetItemInInventory(myinventory);
-                        return MenuType.MainMenu;
-                    }
-                case "4":
-                    {
-                        return MenuType.WeaponCategory;
-                    }
-                default:
-                    {
-                        return MenuType.BowCategory;
-                    }
-            }
-
-        }
-
-    }
-
-    internal class GetItem
-    {
-        public static int m_getItemNumber { get; private set; } = 0;
-        public static Item m_item { get; private set; }
-
-        public static void GetItemInInventory(List<Item> inventory)
-        {
-            for (int i = 0; i < m_getItemNumber; i++)
-            {
-                inventory.Add(m_item);
-            }
-        }
-
-        public static void GetItemNumber()
-        {
-            while (true)
-            {
-                UI.ChoiceMunber($"원하시는 {m_item.m_name}의 ");
-                bool isTrue = int.TryParse(Console.ReadLine(), out int itemNumber);
-                if (isTrue)
-                {
-                    m_getItemNumber = itemNumber;
-                    return;
-                }
-            }
-        }
-
-        public static void GetItemName(string number, WeaponType weaponType)
-        {
-            int.TryParse(number, out int i);
-
-            switch (weaponType)
-            {
-                case WeaponType.Sword:
-                    {
-                        m_item = ItemList.m_swordList[i - 1];
-                    }
-                    break;
-                case WeaponType.Bow:
-                    {
-                        m_item = ItemList.m_bowList[i - 1];
-                    }
-                    break;
-            }
-        }
-
-        public static void GetItemName(string number, ArmourType armourType)
-        {
-            int.TryParse(number, out int i);
-
-            switch (armourType)
-            {
-                case ArmourType.LightArmour:
-                    {
-
-                    }
-                    break;
-            }
-
-        }
-
-        public static void GetItemName(string number)
-        {
-            int.TryParse(number, out int i);
-
-            m_item = ItemList.m_etcList[i - 1];
-
-        }
-
-
-    }
-
 
     internal class Program
     {
         static void Main(string[] args)
         {
-            Menu menu = new Menu();
-            menu.MenuList();
+            Dictionary<string, Monster> monsterDictionary = new Dictionary<string, Monster>();
+            Monster slime = new Slime("숲슬라임", MapType.Forest);
+            Monster wolf = new Wolf("숲늑대", MapType.Forest);
+            Monster orc = new Orc("화산오크", MapType.Volcano);
+            Monster troll = new Troll("숲트롤", MapType.Forest);
+            Monster slimeTwo = null;
+
+            monsterDictionary.Add("슬라임", slime);
+            monsterDictionary.Add("늑대", wolf);
+            monsterDictionary.Add("오크", orc);
+            monsterDictionary.Add("트롤", troll);
+            monsterDictionary.Add("오류슬라임", slimeTwo);
+
+            Console.WriteLine(monsterDictionary["오크"].m_name);
+            monsterDictionary["오크"].Info();
+
+            Console.WriteLine();
+
+            Console.WriteLine(monsterDictionary["트롤"].m_name);
+            monsterDictionary["트롤"].Info();
+
+            Console.WriteLine();
+
+            Console.WriteLine("몬스터 사전에서 오크 제거!");
+            monsterDictionary.Remove("오크");
+
+            if (monsterDictionary.ContainsKey("오크") == false)
+            {
+                Console.WriteLine("이제 몬스터 도감에 오크란 단어는 없습니다!");
+            }
+
+            Console.WriteLine();
+
+            if (monsterDictionary["오류슬라임"] == null)
+            {
+                Console.WriteLine($"비상! 사전에 이상한 데이터가 있는 것 같습니다. 사전에 있는 오류데이터를 삭제합니다!!");
+                monsterDictionary.Remove("오류슬라임");
+
+            }
+
+
         }
     }
 }
