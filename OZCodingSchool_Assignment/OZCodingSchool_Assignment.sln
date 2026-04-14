@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37111.16 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OZCodingSchool_Assignment", "OZCodingSchool_Assignment\OZCodingSchool_Assignment.csproj", "{14094046-A1D0-4038-BA5A-B2D5411B5749}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{14094046-A1D0-4038-BA5A-B2D5411B5749}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14094046-A1D0-4038-BA5A-B2D5411B5749}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14094046-A1D0-4038-BA5A-B2D5411B5749}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14094046-A1D0-4038-BA5A-B2D5411B5749}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BCDEF15F-A8F4-44F0-9D5E-C1CEA75F2A14}
+	EndGlobalSection
+EndGlobal
