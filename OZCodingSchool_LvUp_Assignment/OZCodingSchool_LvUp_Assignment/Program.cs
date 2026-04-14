@@ -6,115 +6,80 @@ using System.Threading.Tasks;
 
 namespace OZCodingSchool_LvUp_Assignment
 {
-    public enum MusicType
+    internal class Gagu
     {
-        None = 0,
-        Jazz = 101,
-        Pop = 201,
-        KPop = 202,
-        JPop = 203,
-        Rock = 301,
-        Metal = 302,
-        HipHop = 401,
-        HardCore = 501,
-        ArtCore = 502,
+        private static int m_id = 0;
+        public int m_myId;
+        public string Name { get; protected set; }
+        public string Description { get; protected set; }
 
+        internal Gagu(string name, string description)
+        {
+            m_id++;
+            m_myId = m_id;
+            Name = name;
+            Description = description;
+        }
     }
 
-    public class Music
+    internal class GaguShop
     {
-        protected string m_name;
-        protected MusicType m_type;
+        private Dictionary<string, Gagu> m_todaysGagu = new Dictionary<string, Gagu>();
 
-        public Music(string name)
+        internal void GetTodaysGagu()
         {
-            m_name = name;
-            m_type = MusicType.None;
+
+            Gagu gaguOne = new Gagu("가구", "가구");
+            Gagu gaguTwo = new Gagu("이상한 가구", "우리가 알던 가구가 아니다");
+            Gagu gaguThree = new Gagu("가구2", "그렇다");
+            Gagu gaguFour = new Gagu("가글", "가글과 가구");
+            Gagu gaguFive = new Gagu("귀찮은 가구", "For문써서 생성할걸");
+            Gagu gaguSix = new Gagu("낭만주의자 가구", "하지만 모든 가구의 이름이 똑같다면 낭만이 없는걸");
+            Gagu gaguSeven = new Gagu("수납장", "진짜 가구");
+            Gagu gaguEight = new Gagu("생선처럼 보이는 가구", "가구가 아닌 정어리");
+            Gagu gaguNine = new Gagu("윗 가구 따라 흘러온 가구", "참치");
+            Gagu gaguTen = new Gagu("코더 가구", "for(int i=0; i < 10; i++) { Gagu gagu = new Gagu(\"가구\"); }");
+
+            m_todaysGagu.Add("삼백원", gaguOne);
+            m_todaysGagu.Add("오백원", gaguTwo);
+            m_todaysGagu.Add("천원", gaguThree);
+            m_todaysGagu.Add("이천원", gaguFour);
+            m_todaysGagu.Add("오천원", gaguFive);
+            m_todaysGagu.Add("만원", gaguSix);
+            m_todaysGagu.Add("오만원", gaguSeven);
+            m_todaysGagu.Add("십억원", gaguEight);
+            m_todaysGagu.Add("일달러", gaguNine);
+            m_todaysGagu.Add("이달러", gaguTen);
         }
 
-        public virtual void Play()
+        internal void OpenShop()
         {
-            Console.WriteLine($"당신은 {m_type} 장르의 {m_name}을 들었다!!");
-        }
+            foreach (string key in m_todaysGagu.Keys)
+            {
+                Console.WriteLine($"가격 : {key}");
+                Gagu gagu = m_todaysGagu[key];
 
+                Console.WriteLine(gagu.Name);
+                Console.WriteLine(gagu.Description);
+            }
+        }
     }
 
-    public class Jazz : Music
+
+
+    internal class Program
     {
-
-        public Jazz(string name) : base(name)
+        static void Main(string[] leeKiWoong)
         {
-            m_type = MusicType.Jazz;
-        }
+            GaguShop newGaguShop = new GaguShop();
 
-        public override void Play()
-        {
-            base.Play();
-        }
+            newGaguShop.GetTodaysGagu();
 
-    }
+            newGaguShop.OpenShop();
 
-    public class Pop : Music
-    {
-        public Pop(string name) : base(name)
-        {
-            m_type = MusicType.Pop;
-        }
-
-        public override void Play()
-        {
-            base.Play();
-            Console.WriteLine("당신은 잔잔한 팝송을 듣고 마음이 편안해졌다!!");
-        }
-
-    }
-
-    public class Rock : Music
-    {
-        public Rock(string name) : base(name)
-        {
-            m_type = MusicType.Rock;
-        }
-
-        public override void Play()
-        {
-            base.Play();
-            Console.WriteLine("당신은 일렉기타의 소리에 의해서 마음이 흥분되기 시작했다!!");
-        }
-
-    }
-
-    public class ArtCore : Music
-    {
-        public ArtCore(string name) : base(name)
-        {
-            m_type = MusicType.ArtCore;
-        }
-
-        public override void Play()
-        {
-            base.Play();
-            Console.WriteLine("당신은 기분이 좋아졌다!!");
-        }
-
-    }
-
-    internal class LeeKiWoong
-    {
-        static void Main(string[] leekiwoong)
-        {
-
-            ArtCore artCore = new ArtCore("Orchid");
-            artCore.Play();
-
-            Music pop = new Pop("set fire to the rain");
-            pop.Play();
-
-            Pop realpop = pop as Pop;
-
-            realpop.Play();
 
 
         }
+
     }
 }
