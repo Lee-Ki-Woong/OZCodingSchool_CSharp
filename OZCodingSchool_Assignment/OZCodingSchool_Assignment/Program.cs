@@ -8,76 +8,210 @@ namespace OZCodingSchool_Assignment
 {
     internal class LeeKiWoong
     {
-        internal interface IJumpable
+        internal interface BattleAble
         {
-            void Jump();
+            int Hp { get; }
+            int ATK { get; }
         }
 
-        internal interface ITransformable
+        internal interface PlayAble
         {
-            void Transform();
+
         }
 
-        internal interface ITerrorable
+        internal enum EntityType
         {
-            void Terror();
+            None = 0,
+            Player = 1,
+            NPC = 2,
+            Monster = 3,
         }
 
-        internal class Ball : IJumpable, ITransformable, ITerrorable
+
+
+        internal class Entity : BattleAble
         {
-            public string Name { get; protected set; }
-            protected bool m_isTransform;
+            public string Name { get; private set; }
+            public int Hp { get; private set; }
+            public int ATK { get; private set; }
+            public EntityType MyType { get; protected set; }
 
-
-            public Ball(string name)
+            public Entity(string name, int hp, int atk)
             {
                 Name = name;
-                m_isTransform = false;
+                Hp = hp;
+                ATK = atk;
+                MyType = EntityType.None;
             }
 
-            public virtual void Jump()
+            public virtual void Attack(Entity entity)
             {
-                if (m_isTransform)
+                UIManager.Instance.ViewingText($"{Name}은 {entity.Name}에게 {ATK}의 데미지를 입혔다!!");
+                entity.TakeDamage(ATK);
+            }
+
+            public virtual void TakeDamage(int damage)
+            {
+                UIManager.Instance.ViewingText($"{Name}은 {damage}의 데미지를 받았다!!");
+                Hp -= damage;
+
+                if (Hp < 0)
                 {
-                    UIManager.Instance.ViewingText($"{Name}은 하늘 높이 날아올랐다!!", $"{Name} : 날 가지고 놀던 너희 인간들에게 심판을 내려주마!!");
-                    return;
+                    Hp = 0;
                 }
 
-                UIManager.Instance.ViewingText($"{Name}이 통통 튀었다.");
+                UIManager.Instance.ViewingText($"{Name}의 남은 체력 : {Hp}");
             }
-            void ITransformable.Transform()
-            {
-                UIManager.Instance.ViewingText($"{Name}은 로봇으로 변신을 하였다.", "위잉 - 치킨");
-                m_isTransform = true;
-            }
-
-            public void Terror()
-            {
-                if (m_isTransform)
-                {
-                    UIManager.Instance.ViewingText($"{Name}은 사람에 대한 무차별 공격을 가하기 시작했다!", $"{Name} : 인간 시대의 끝이 도래했다!!");
-                    return;
-                }
-
-                UIManager.Instance.ViewingText($"{Name}이 이웃집의 창문을 깨부셨다!!", "이웃집 아주머니가 화가 난 거 같다!! 도망치자!!");
-            }
-
         }
 
-        internal class SmallBall : Ball, IJumpable
+        internal class Player : Entity, PlayAble
         {
-            public SmallBall(string name) : base(name)
+            public Player(string name, int hp, int atk) : base(name, hp, atk)
             {
-                m_isTransform = false;
+                MyType = EntityType.Player;
             }
 
-            public override void Jump()
+            public override void Attack(Entity entity)
             {
-                UIManager.Instance.ViewingText($"{Name}가 통! 하고 높이 뛰어올랐다!");
+                UIManager.Instance.ViewingText($"플레이어 {Name}은 {entity.Name}에게 {ATK}의 데미지를 입혔다!!");
+                entity.TakeDamage(ATK);
             }
 
+            public override void TakeDamage(int damage)
+            {
+                base.TakeDamage(damage);
+            }
         }
 
+        internal class Monster : Entity
+        {
+            public Monster(string name, int hp, int atk) : base(name, hp, atk)
+            {
+                MyType = EntityType.Monster;
+            }
+
+            public override void Attack(Entity entity)
+            {
+                UIManager.Instance.ViewingText($"몬스터 {Name}은 {entity.Name}에게 {ATK}의 데미지를 입혔다!!");
+                entity.TakeDamage(ATK);
+            }
+
+            public override void TakeDamage(int damage)
+            {
+                base.TakeDamage(damage);
+            }
+        }
+
+
+
+        internal class BattleManager
+        {
+            private static BattleManager m_instance;
+            private BattleManager() { }
+
+            public static BattleManager Instance
+            {
+                get
+                {
+                    if (m_instance == null)
+                    {
+                        m_instance = new BattleManager();
+                    }
+                    return m_instance;
+                }
+            }
+
+
+
+            public void ReadyToBattle(Entity attacker, Entity defender)
+            {
+                UIManager.Instance.ViewingText($"{attacker.Name}가 {defender.Name}에게 싸움을 걸었다!");
+
+                while (attacker.Hp > 0 && defender.Hp > 0)
+                {
+                    if (myTurn(attacker, defender)) return;
+
+                    if (defender.Hp <= 0)
+                    {
+                        Defeat(defender.Name);
+                        return;
+                    }
+
+                    if (myTurn(defender, attacker)) return;
+
+                    if (attacker.Hp <= 0)
+                    {
+                        Defeat(attacker.Name);
+                        return;
+                    }
+                }
+            }
+
+            public bool myTurn(Entity attacker, Entity defender)
+            {
+                if (attacker is PlayAble)
+                {
+                    UIManager.Instance.ViewingText($"{attacker.Name}이 취할 행동을 선택하여 주십시오", "1. 공격하기  그외. 도망가기");
+
+                    int choice = InputManager.Instance.SelectNumberInBattle(Console.ReadLine());
+
+                    if (choice != 1)
+                    {
+                        UIManager.Instance.ViewingText($"{attacker.Name}은 재빠르게 도망갔습니다!");
+                        return true;
+                    }
+                }
+                attacker.Attack(defender);
+                return false;
+
+            }
+
+            public bool Defeat(string name)
+            {
+                UIManager.Instance.ViewingText($"{name}는 패배했습니다!");
+                return true;
+            }
+        }
+
+
+
+        internal class InputManager
+        {
+            private static InputManager m_instance;
+
+            private InputManager() { }
+
+            public static InputManager Instance
+            {
+                get
+                {
+                    if (m_instance == null)
+                    {
+                        m_instance = new InputManager();
+                    }
+                    return m_instance;
+                }
+            }
+
+            public int SelectNumberInBattle(string number)
+            {
+                switch (number)
+                {
+                    case "1":
+                        {
+                            return 1;
+                        }
+                    case "2":
+                        {
+                            return 2;
+                        }
+                    default:
+                        {
+                            return 0;
+                        }
+                }
+            }
+        }
 
 
 
@@ -124,40 +258,18 @@ namespace OZCodingSchool_Assignment
 
         }
 
+
+
+
         internal class Program
         {
             static void Main(string[] leeKiWoong)
             {
-                Ball ballOne = new Ball("축구공");
-                ballOne.Jump();
-                ballOne.Terror();
+                Player kiwoong = new Player("기웅", 500, 50);
+                Monster slime = new Monster("슬라임", 100, 5);
 
-                Ball ballTwo = new Ball("공인척하는 메가트론");
-                ballTwo.Jump();
-                ballTwo.Terror();
+                BattleManager.Instance.ReadyToBattle(kiwoong, slime);
 
-                ((ITransformable)ballTwo).Transform();
-
-                ballTwo.Jump();
-                ballTwo.Terror();
-
-                SmallBall ballThree = new SmallBall("탁구공");
-                ballThree.Jump();
-
-                List<IJumpable> jumpableList = new List<IJumpable>();
-
-                jumpableList.Add(ballThree);
-                jumpableList.Add(ballTwo);
-                jumpableList.Add(ballOne);
-
-                foreach (IJumpable jumpable in jumpableList)
-                {
-                    if (jumpable is Ball)
-                    {
-                        jumpable.Jump();
-                    }
-
-                }
             }
         }
     }
