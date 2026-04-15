@@ -3,274 +3,198 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 
 namespace OZCodingSchool_Assignment
 {
-    internal class LeeKiWoong
+    internal interface AttackAble
     {
-        internal interface BattleAble
+        int Max_Hp { get; }
+        int Hp {  get; }
+        int Damage {  get; }
+        int Armour { get; }
+
+        void TakeDamage(int damage);
+    }
+
+    internal enum EntityType
+    {
+        None = 0,
+        Player = 1,
+        NPC = 2,
+        Monster = 3,
+    }
+
+    internal delegate void AttackAction(string name, int hp, int damage);
+
+    internal class Entity
+    {
+        public string Id { get; private set; }
+        public string Name { get; private set; }
+        public string Description { get; private set; }
+        public EntityType MyEntityType { get; protected set; }
+
+
+
+        public Entity(string id, string name, string description)
         {
-            int Hp { get; }
-            int ATK { get; }
+            Id = id;
+            Name = name;
+            Description = description;
+            MyEntityType = EntityType.Player;
+        }
+    }
+
+
+    internal class Player : Entity, AttackAble
+    {
+        public int Max_Hp { get; private set; }
+        public int Hp { get; private set; }
+        public int Damage { get; private set; }
+        public int Armour { get; private set; }
+
+        public event AttackAction OnDamaged;
+
+        public event Action<string, int, int> OnDamagedTwo;
+
+
+
+        public Player(string  id, string name, string description, int max_Hp, int hp, int damage, int armour) : base (id, name,  description)
+        {
+            Max_Hp = max_Hp;
+            Hp = hp;
+            Damage = damage;
+            Armour = armour;
+            MyEntityType = EntityType.Player;
         }
 
-        internal interface PlayAble
+        public void TakeDamage(int damage)
         {
+            int finalDamage = damage - Armour;
 
+            if (finalDamage <= 0) finalDamage = 0;
+
+            Hp -= finalDamage;
+
+            OnDamaged?.Invoke(Name, Hp, finalDamage);
         }
 
-        internal enum EntityType
+        public void TakeDamage(int damage, string name)
         {
-            None = 0,
-            Player = 1,
-            NPC = 2,
-            Monster = 3,
+            int finalDamage = damage - Armour;
+
+            if (finalDamage <= 0) finalDamage = 0;
+
+            Hp -= finalDamage;
+
+            OnDamagedTwo?.Invoke(Name, Hp, finalDamage);
+        }
+    }
+
+    internal class Monster : Entity, AttackAble
+    {
+        public int Max_Hp { get; private set; }
+        public int Hp { get; private set; }
+        public int Damage { get; private set; }
+        public int Armour { get; private set; }
+
+        public event Action<bool> OnDamaged;
+
+        public event Func<string, int, int, bool> OnDamagedTwo;
+
+
+        public Monster(string id, string name, string description, int max_Hp, int hp, int damage, int armonur) : base(id, name, description)
+        {
+            Max_Hp = max_Hp;
+            Hp = hp;
+            Damage = damage;
+            Armour = armonur;
+            MyEntityType = EntityType.Monster;
         }
 
-
-
-        internal class Entity : BattleAble
+        public void TakeDamage(int damage)
         {
-            public string Name { get; private set; }
-            public int Hp { get; private set; }
-            public int ATK { get; private set; }
-            public EntityType MyType { get; protected set; }
+            int finalDamage = damage - Armour;
 
-            public Entity(string name, int hp, int atk)
+            if (finalDamage <= 0) finalDamage = 0;
+
+            Hp -= finalDamage;
+
+            if(OnDamagedTwo != null)
             {
-                Name = name;
-                Hp = hp;
-                ATK = atk;
-                MyType = EntityType.None;
-            }
-
-            public virtual void Attack(Entity entity)
-            {
-                UIManager.Instance.ViewingText($"{Name}은 {entity.Name}에게 {ATK}의 데미지를 입혔다!!");
-                entity.TakeDamage(ATK);
-            }
-
-            public virtual void TakeDamage(int damage)
-            {
-                UIManager.Instance.ViewingText($"{Name}은 {damage}의 데미지를 받았다!!");
-                Hp -= damage;
-
-                if (Hp < 0)
-                {
-                    Hp = 0;
-                }
-
-                UIManager.Instance.ViewingText($"{Name}의 남은 체력 : {Hp}");
-            }
-        }
-
-        internal class Player : Entity, PlayAble
-        {
-            public Player(string name, int hp, int atk) : base(name, hp, atk)
-            {
-                MyType = EntityType.Player;
-            }
-
-            public override void Attack(Entity entity)
-            {
-                UIManager.Instance.ViewingText($"플레이어 {Name}은 {entity.Name}에게 {ATK}의 데미지를 입혔다!!");
-                entity.TakeDamage(ATK);
-            }
-
-            public override void TakeDamage(int damage)
-            {
-                base.TakeDamage(damage);
-            }
-        }
-
-        internal class Monster : Entity
-        {
-            public Monster(string name, int hp, int atk) : base(name, hp, atk)
-            {
-                MyType = EntityType.Monster;
-            }
-
-            public override void Attack(Entity entity)
-            {
-                UIManager.Instance.ViewingText($"몬스터 {Name}은 {entity.Name}에게 {ATK}의 데미지를 입혔다!!");
-                entity.TakeDamage(ATK);
-            }
-
-            public override void TakeDamage(int damage)
-            {
-                base.TakeDamage(damage);
-            }
-        }
-
-
-
-        internal class BattleManager
-        {
-            private static BattleManager m_instance;
-            private BattleManager() { }
-
-            public static BattleManager Instance
-            {
-                get
-                {
-                    if (m_instance == null)
-                    {
-                        m_instance = new BattleManager();
-                    }
-                    return m_instance;
-                }
-            }
-
-
-
-            public void ReadyToBattle(Entity attacker, Entity defender)
-            {
-                UIManager.Instance.ViewingText($"{attacker.Name}가 {defender.Name}에게 싸움을 걸었다!");
-
-                while (attacker.Hp > 0 && defender.Hp > 0)
-                {
-                    if (myTurn(attacker, defender)) return;
-
-                    if (defender.Hp <= 0)
-                    {
-                        Defeat(defender.Name);
-                        return;
-                    }
-
-                    if (myTurn(defender, attacker)) return;
-
-                    if (attacker.Hp <= 0)
-                    {
-                        Defeat(attacker.Name);
-                        return;
-                    }
-                }
-            }
-
-            public bool myTurn(Entity attacker, Entity defender)
-            {
-                if (attacker is PlayAble)
-                {
-                    UIManager.Instance.ViewingText($"{attacker.Name}이 취할 행동을 선택하여 주십시오", "1. 공격하기  그외. 도망가기");
-
-                    int choice = InputManager.Instance.SelectNumberInBattle(Console.ReadLine());
-
-                    if (choice != 1)
-                    {
-                        UIManager.Instance.ViewingText($"{attacker.Name}은 재빠르게 도망갔습니다!");
-                        return true;
-                    }
-                }
-                attacker.Attack(defender);
-                return false;
-
-            }
-
-            public bool Defeat(string name)
-            {
-                UIManager.Instance.ViewingText($"{name}는 패배했습니다!");
-                return true;
-            }
-        }
-
-
-
-        internal class InputManager
-        {
-            private static InputManager m_instance;
-
-            private InputManager() { }
-
-            public static InputManager Instance
-            {
-                get
-                {
-                    if (m_instance == null)
-                    {
-                        m_instance = new InputManager();
-                    }
-                    return m_instance;
-                }
-            }
-
-            public int SelectNumberInBattle(string number)
-            {
-                switch (number)
-                {
-                    case "1":
-                        {
-                            return 1;
-                        }
-                    case "2":
-                        {
-                            return 2;
-                        }
-                    default:
-                        {
-                            return 0;
-                        }
-                }
-            }
-        }
-
-
-
-        internal class UIManager
-        {
-            private static UIManager m_instance;
-
-            private UIManager() { }
-
-            public static UIManager Instance
-            {
-                get
-                {
-                    if (m_instance == null)
-                    {
-                        m_instance = new UIManager();
-                    }
-                    return m_instance;
-                }
-            }
-
-
-
-            public void ViewingText(string textOne)
-            {
-                Console.WriteLine(textOne);
-                Console.WriteLine();
-            }
-
-            public void ViewingText(string textOne, string textTwo)
-            {
-                Console.WriteLine(textOne);
-                Console.WriteLine(textTwo);
-                Console.WriteLine();
-            }
-
-            public void ViewingText(string textOne, string textTwo, string textThree)
-            {
-                Console.WriteLine(textOne);
-                Console.WriteLine(textTwo);
-                Console.WriteLine(textThree);
-                Console.WriteLine();
-            }
-
-        }
-
-
-
-
-        internal class Program
-        {
-            static void Main(string[] leeKiWoong)
-            {
-                Player kiwoong = new Player("기웅", 500, 50);
-                Monster slime = new Monster("슬라임", 100, 5);
-
-                BattleManager.Instance.ReadyToBattle(kiwoong, slime);
-
+                bool isDamaged = OnDamagedTwo.Invoke(Name, Hp, finalDamage);
+                OnDamaged?.Invoke(isDamaged);
             }
         }
     }
+
+    internal class UIManager
+    {
+        private static UIManager m_instance;
+
+        private UIManager() { }
+
+        public static UIManager Instance
+        {
+            get
+            {
+                if(m_instance == null)
+                {
+                    m_instance = new UIManager();
+                }
+                return m_instance;
+            }
+        }
+
+        public void AttackUI(string name, int hp, int damage)
+        {
+            Console.WriteLine($"{name}은 {damage}의 피해를 받아 체력이 {hp}만큼 남았다!!");
+        }
+
+        public bool AttackUITwo(string name, int hp, int damage)
+        {
+            Console.WriteLine($"{name}은 {damage}의 피해를 받아 체력이 {hp}만큼 남았다!!");
+            return true;
+        }
+
+        public void Damaged(bool isTrue)
+        {
+            if(isTrue)
+            {
+                Console.WriteLine("데미지를 받았구나!");
+            }
+        }
+
+        
+
+    }
+
+    internal class Program
+    {
+        public static void RefreshAttackUI(string name, int hp, int damage)
+        {
+            UIManager.Instance.AttackUI(name, hp, damage);
+            UIManager.Instance.AttackUITwo(name, hp, damage);
+        }
+        static void Main(string[] leeKiWoong)
+        {
+            Player kiwoong = new Player("Entity_Player_01", "기웅", "사람이다.", 500, 500, 50, 25);
+            Monster slime = new Monster("Entity_Monster_Slime_Normal_01", "슬라임", "평범한 슬라임이다", 100, 100, 50, 0);
+
+
+            slime.OnDamagedTwo += (UIManager.Instance.AttackUITwo);
+            slime.OnDamaged += (UIManager.Instance.Damaged);
+
+            slime.TakeDamage(kiwoong.Damage);
+
+
+            kiwoong.OnDamaged += RefreshAttackUI;
+
+            kiwoong.TakeDamage(slime.Damage);
+            kiwoong.TakeDamage(slime.Damage, slime.Name);
+
+
+        }
+    }
+
 }
