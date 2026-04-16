@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,202 +9,102 @@ using System.Xml.Schema;
 
 namespace OZCodingSchool_Assignment
 {
-    internal interface AttackAble
+    public interface DamageAble
     {
-        int Max_Hp { get; }
-        int Hp {  get; }
-        int Damage {  get; }
-        int Armour { get; }
 
-        void TakeDamage(int damage);
     }
 
-    internal enum EntityType
+
+    internal class Cocoa : DamageAble
     {
-        None = 0,
-        Player = 1,
-        NPC = 2,
-        Monster = 3,
-    }
+        public string Name {  get; private set; }
+        public int Damage { get; private set; }
 
-    internal delegate void AttackAction(string name, int hp, int damage);
+        public event Action<string, int> OnDamaged;
 
-    internal class Entity
-    {
-        public string Id { get; private set; }
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public EntityType MyEntityType { get; protected set; }
-
-
-
-        public Entity(string id, string name, string description)
+        public Cocoa(string name ,int damage)
         {
-            Id = id;
             Name = name;
-            Description = description;
-            MyEntityType = EntityType.Player;
-        }
-    }
-
-
-    internal class Player : Entity, AttackAble
-    {
-        public int Max_Hp { get; private set; }
-        public int Hp { get; private set; }
-        public int Damage { get; private set; }
-        public int Armour { get; private set; }
-
-        public event AttackAction OnDamaged;
-
-        public event Action<string, string, int, int> OnDamagedTwo;
-
-        public Player(string  id, string name, string description, int max_Hp, int hp, int damage, int armour) : base (id, name,  description)
-        {
-            Max_Hp = max_Hp;
-            Hp = hp;
             Damage = damage;
-            Armour = armour;
-            MyEntityType = EntityType.Player;
         }
 
-        public void TakeDamage(int damage)
+        public void BindCocoaDamagedEvent(Action<string, int> damagedCallback)
         {
-            int finalDamage = damage - Armour;
-
-            if (finalDamage <= 0) finalDamage = 0;
-
-            Hp -= finalDamage;
-
-            OnDamaged?.Invoke(Name, Hp, finalDamage);
+            OnDamaged += damagedCallback;
         }
 
-        public void TakeDamage(int damage, string name)
+        public void CocoaDamaged(int damaged)
         {
-            int finalDamage = damage - Armour;
-
-            if (finalDamage <= 0) finalDamage = 0;
-
-            Hp -= finalDamage;
-
-            OnDamagedTwo?.Invoke(name, Name, Hp, finalDamage);
+            if (OnDamaged != null)
+            {
+                OnDamaged.Invoke(Name, damaged);
+            }
         }
     }
 
-    internal class Monster : Entity, AttackAble
+    internal class SuperStone
     {
-        public int Max_Hp { get; private set; }
-        public int Hp { get; private set; }
+        public string Name { get; private set; }
         public int Damage { get; private set; }
-        public int Armour { get; private set; }
 
-        public event Action<bool> OnDamaged;
+        public event Action<string, int> OnDamaged;
 
-        public event Func<string, int, int, bool> OnDamagedTwo;
-
-
-        public Monster(string id, string name, string description, int max_Hp, int hp, int damage, int armonur) : base(id, name, description)
+        public SuperStone(string name, int damage)
         {
-            Max_Hp = max_Hp;
-            Hp = hp;
+            Name = name;
             Damage = damage;
-            Armour = armonur;
-            MyEntityType = EntityType.Monster;
         }
 
-        public void TakeDamage(int damage)
+        public void BindSuperStoneDamagedEvent(Action<string, int> damagedCallback)
         {
-            int finalDamage = damage - Armour;
+            OnDamaged += damagedCallback;
+        }
 
-            if (finalDamage <= 0) finalDamage = 0;
-
-            Hp -= finalDamage;
-
-            if(OnDamagedTwo != null)
+        public void SuperStoneDamaged(int damaged)
+        {
+            if (OnDamaged != null)
             {
-                bool isDamaged = OnDamagedTwo.Invoke(Name, Hp, finalDamage);
-                OnDamaged?.Invoke(isDamaged);
+                OnDamaged.Invoke(Name, damaged);
             }
         }
     }
 
-    internal class UIManager
+    internal class Damaged
     {
-        private static UIManager m_instance;
-
-        private UIManager() { }
-
-        public static UIManager Instance
+        public void EntityDamaged<T>(string name, int damage) where T : DamageAble
         {
-            get
-            {
-                if(m_instance == null)
-                {
-                    m_instance = new UIManager();
-                }
-                return m_instance;
-            }
+            Console.WriteLine($"{name}은 {damage}만큼의 데미지를 받았다!!");
         }
 
-        public void AttackUI(string name, int hp, int damage)
+        public void EntityDamaged(string name, int damage)
         {
-            Console.WriteLine($"{name}은 {damage}의 피해를 받아 체력이 {hp}만큼 남았다!!");
+            Console.WriteLine($"{name}은 데미지를 받지 않는다!! {damage}만큼의 데미지가 무시되었다!!");
         }
-
-        public bool AttackUITwo(string name, int hp, int damage)
-        {
-            Console.WriteLine($"{name}은 {damage}의 피해를 받아 체력이 {hp}만큼 남았다!!");
-            return true;
-        }
-
-        public void AttackUIThree(string attackerName, string defenderName, int hp, int damage)
-        {
-            Console.WriteLine($"{defenderName}은 {attackerName}에게 {damage}의 피해를 받아 체력이 {hp}만큼 남았다!!");
-        }
-
-        public void Damaged(bool isTrue)
-        {
-            if(isTrue)
-            {
-                Console.WriteLine("데미지를 받았구나!");
-            }
-        }
-
-        
-
     }
 
     internal class Program
     {
-        public static void RefreshAttackUI(string name, int hp, int damage)
-        {
-            UIManager.Instance.AttackUI(name, hp, damage);
-            UIManager.Instance.AttackUITwo(name, hp, damage);
-        }
-
         static void Main(string[] leeKiWoong)
         {
-            Player kiwoong = new Player("Entity_Player_01", "기웅", "사람이다.", 500, 500, 50, 25);
-            Monster slime = new Monster("Entity_Monster_Slime_Normal_01", "슬라임", "평범한 슬라임이다", 100, 100, 50, 0);
+            Cocoa goodCocoa = new Cocoa("코코아", 10);
+            SuperStone BadSuperStone = new SuperStone("무적돌", 500);
+
+            // 뭔가 static 클래스와 매서드로 있어야 될 거 같은 클래스긴 한데,
+            // 이벤트 구조를 잘 쓰기 위해서 = static이면 델리게이트로 접근하는 방식이 의미가 없으니까 일부러 일반 클래스로 만들었습니다.
+            Damaged damaged = new Damaged();
+
+            goodCocoa.BindCocoaDamagedEvent(damaged.EntityDamaged<Cocoa>);
+            goodCocoa.CocoaDamaged(BadSuperStone.Damage);
 
 
-            slime.OnDamagedTwo += (UIManager.Instance.AttackUITwo);
-            slime.OnDamaged += (UIManager.Instance.Damaged);
+            //주강사님의 포크를 보고 미리 예습한 제네릭 사용해보기!
+            //SuperStone은 DamageAble을 상속받지 않기 때문에,  Entity_Damaged<T> 제네릭 메서드를 사용할 수 없다!
+            //BadSuperStone.Bind_SuperStone_Damaged_Event(damaged.Entity_Damaged<SuperStone>);
 
-            slime.TakeDamage(kiwoong.Damage);
-
-
-            kiwoong.OnDamaged += RefreshAttackUI;
-
-            kiwoong.TakeDamage(slime.Damage);
-
-            kiwoong.OnDamaged -= RefreshAttackUI;
-            kiwoong.OnDamagedTwo += (UIManager.Instance.AttackUIThree);
-
-            kiwoong.TakeDamage(slime.Damage, slime.Name);
+            BadSuperStone.BindSuperStoneDamagedEvent(damaged.EntityDamaged);
+            BadSuperStone.SuperStoneDamaged(goodCocoa.Damage);
 
 
         }
     }
-
 }
