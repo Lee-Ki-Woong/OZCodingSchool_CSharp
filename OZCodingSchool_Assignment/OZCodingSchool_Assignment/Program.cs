@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using System.Xml.Schema;
 
 namespace OZCodingSchool_Assignment
@@ -55,9 +56,7 @@ namespace OZCodingSchool_Assignment
 
         public event AttackAction OnDamaged;
 
-        public event Action<string, int, int> OnDamagedTwo;
-
-
+        public event Action<string, string, int, int> OnDamagedTwo;
 
         public Player(string  id, string name, string description, int max_Hp, int hp, int damage, int armour) : base (id, name,  description)
         {
@@ -87,7 +86,7 @@ namespace OZCodingSchool_Assignment
 
             Hp -= finalDamage;
 
-            OnDamagedTwo?.Invoke(Name, Hp, finalDamage);
+            OnDamagedTwo?.Invoke(name, Name, Hp, finalDamage);
         }
     }
 
@@ -157,6 +156,11 @@ namespace OZCodingSchool_Assignment
             return true;
         }
 
+        public void AttackUIThree(string attackerName, string defenderName, int hp, int damage)
+        {
+            Console.WriteLine($"{defenderName}은 {attackerName}에게 {damage}의 피해를 받아 체력이 {hp}만큼 남았다!!");
+        }
+
         public void Damaged(bool isTrue)
         {
             if(isTrue)
@@ -176,6 +180,7 @@ namespace OZCodingSchool_Assignment
             UIManager.Instance.AttackUI(name, hp, damage);
             UIManager.Instance.AttackUITwo(name, hp, damage);
         }
+
         static void Main(string[] leeKiWoong)
         {
             Player kiwoong = new Player("Entity_Player_01", "기웅", "사람이다.", 500, 500, 50, 25);
@@ -191,6 +196,10 @@ namespace OZCodingSchool_Assignment
             kiwoong.OnDamaged += RefreshAttackUI;
 
             kiwoong.TakeDamage(slime.Damage);
+
+            kiwoong.OnDamaged -= RefreshAttackUI;
+            kiwoong.OnDamagedTwo += (UIManager.Instance.AttackUIThree);
+
             kiwoong.TakeDamage(slime.Damage, slime.Name);
 
 
