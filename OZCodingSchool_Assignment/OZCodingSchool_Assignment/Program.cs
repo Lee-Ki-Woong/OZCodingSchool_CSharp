@@ -9,69 +9,97 @@ using System.Xml.Schema;
 
 namespace OZCodingSchool_Assignment
 {
-    public interface DamageAble
+    public interface IDamageAble
     {
-
+        string Name { get; }
+        int Damage { get; }
     }
 
-
-    internal class Cocoa : DamageAble
+    internal class Entity
     {
-        public string Name {  get; private set; }
-        public int Damage { get; private set; }
+        public string Name { get; set; }
+        public int Damage { get; set; }
 
-        public event Action<string, int> OnDamaged;
-
-        public Cocoa(string name ,int damage)
+        public Entity(string name, int damage)
         {
             Name = name;
             Damage = damage;
         }
 
-        public void BindCocoaDamagedEvent(Action<string, int> damagedCallback)
+        
+    }
+
+    internal class Cocoa : Entity, IDamageAble
+    {
+        public event Action<string, int> OnDamaged;
+
+        public Cocoa(string name ,int damage) : base (name, damage) { }
+
+        public void BindDamagedEvent(Action<string, int> damaged)
         {
-            OnDamaged += damagedCallback;
+            OnDamaged += damaged;
         }
 
-        public void CocoaDamaged(int damaged)
+        public void CocoaDamaged(Func<bool> damaged, Action NoDamagedCallback)
         {
-            if (OnDamaged != null)
+            bool isChoice = damaged();
+            
+            if(isChoice)
             {
-                OnDamaged.Invoke(Name, damaged);
+                OnDamaged?.Invoke(Name, Damage);
+            }
+            else
+            {
+                NoDamagedCallback();
             }
         }
     }
 
-    internal class SuperStone
+    internal class SuperStone : Entity
     {
-        public string Name { get; private set; }
-        public int Damage { get; private set; }
-
         public event Action<string, int> OnDamaged;
 
-        public SuperStone(string name, int damage)
-        {
-            Name = name;
-            Damage = damage;
-        }
+        public SuperStone(string name, int damage) : base (name, damage) { }
 
-        public void BindSuperStoneDamagedEvent(Action<string, int> damagedCallback)
+        public void BindDamagedEvent(Action<string, int> damaged)
         {
-            OnDamaged += damagedCallback;
+            OnDamaged += damaged;
         }
-
-        public void SuperStoneDamaged(int damaged)
+        public void SuperStoneDamaged(Func<bool> damaged, Action NoDamagedCallback)
         {
-            if (OnDamaged != null)
+            bool isChoice = damaged();
+
+            if (isChoice)
             {
-                OnDamaged.Invoke(Name, damaged);
+                OnDamaged?.Invoke(Name, Damage);
+            }
+            else
+            {
+                NoDamagedCallback();
             }
         }
     }
 
     internal class Damaged
     {
-        public void EntityDamaged<T>(string name, int damage) where T : DamageAble
+        public bool CheckAttack()
+        {
+            Console.WriteLine("공격을 하시겠습니까?");
+            string choice = Console.ReadLine();
+
+            choice = choice.ToLower();
+
+            if (choice == "y")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void EntityDamaged<T>(string name, int damage) where T : IDamageAble
         {
             Console.WriteLine($"{name}은 {damage}만큼의 데미지를 받았다!!");
         }
@@ -80,6 +108,20 @@ namespace OZCodingSchool_Assignment
         {
             Console.WriteLine($"{name}은 데미지를 받지 않는다!! {damage}만큼의 데미지가 무시되었다!!");
         }
+
+        public void EntityNoDamaged()
+        {
+            Console.WriteLine("데미지를 받지 않았다!!");
+        }
+    }
+
+    internal class Test
+    {
+        public void Ramda()
+        {
+            Action<string> asdf = (string aaa) => { Console.WriteLine("야호"); };
+        }
+    
     }
 
     internal class Program
@@ -92,17 +134,13 @@ namespace OZCodingSchool_Assignment
             // 뭔가 static 클래스와 매서드로 있어야 될 거 같은 클래스긴 한데,
             // 이벤트 구조를 잘 쓰기 위해서 = static이면 델리게이트로 접근하는 방식이 의미가 없으니까 일부러 일반 클래스로 만들었습니다.
             Damaged damaged = new Damaged();
+            goodCocoa.BindDamagedEvent(damaged.EntityDamaged<Cocoa>);
+            BadSuperStone.BindDamagedEvent(damaged.EntityDamaged);
 
-            goodCocoa.BindCocoaDamagedEvent(damaged.EntityDamaged<Cocoa>);
-            goodCocoa.CocoaDamaged(BadSuperStone.Damage);
 
+            goodCocoa.CocoaDamaged(damaged.CheckAttack, damaged.EntityNoDamaged);
+            BadSuperStone.SuperStoneDamaged(damaged.CheckAttack, damaged.EntityNoDamaged);
 
-            //주강사님의 포크를 보고 미리 예습한 제네릭 사용해보기!
-            //SuperStone은 DamageAble을 상속받지 않기 때문에,  Entity_Damaged<T> 제네릭 메서드를 사용할 수 없다!
-            //BadSuperStone.Bind_SuperStone_Damaged_Event(damaged.Entity_Damaged<SuperStone>);
-
-            BadSuperStone.BindSuperStoneDamagedEvent(damaged.EntityDamaged);
-            BadSuperStone.SuperStoneDamaged(goodCocoa.Damage);
 
 
         }
