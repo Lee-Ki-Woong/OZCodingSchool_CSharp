@@ -82,6 +82,21 @@ namespace OZCodingSchool_Assignment
 
     internal class Damaged
     {
+        private static Damaged m_instance;
+        private Damaged() { }
+        public static Damaged Instance
+        {
+            get
+            {
+                if(m_instance == null)
+                {
+                    m_instance = new Damaged();
+                }
+                return m_instance;
+            }
+        }
+
+
         public bool CheckAttack()
         {
             Console.WriteLine("공격을 하시겠습니까?");
@@ -131,15 +146,13 @@ namespace OZCodingSchool_Assignment
             Cocoa goodCocoa = new Cocoa("코코아", 10);
             SuperStone BadSuperStone = new SuperStone("무적돌", 500);
 
-            // 뭔가 static 클래스와 매서드로 있어야 될 거 같은 클래스긴 한데,
-            // 이벤트 구조를 잘 쓰기 위해서 = static이면 델리게이트로 접근하는 방식이 의미가 없으니까 일부러 일반 클래스로 만들었습니다.
-            Damaged damaged = new Damaged();
-            goodCocoa.BindDamagedEvent(damaged.EntityDamaged<Cocoa>);
-            BadSuperStone.BindDamagedEvent(damaged.EntityDamaged);
+
+            goodCocoa.BindDamagedEvent(Damaged.Instance.EntityDamaged<Cocoa>);
+            BadSuperStone.BindDamagedEvent(Damaged.Instance.EntityDamaged);
 
 
-            goodCocoa.CocoaDamaged(damaged.CheckAttack, damaged.EntityNoDamaged);
-            BadSuperStone.SuperStoneDamaged(damaged.CheckAttack, damaged.EntityNoDamaged);
+            goodCocoa.CocoaDamaged(Damaged.Instance.CheckAttack, Damaged.Instance.EntityNoDamaged);
+            BadSuperStone.SuperStoneDamaged(Damaged.Instance.CheckAttack, Damaged.Instance.EntityNoDamaged);
 
 
 
