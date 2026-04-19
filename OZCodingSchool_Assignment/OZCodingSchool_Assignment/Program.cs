@@ -1,115 +1,101 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using System.Xml.Schema;
 
 namespace OZCodingSchool_Assignment
 {
+    internal class Entity
+    {
+        public string Name { get; set; }
+        public int Damage { get; set; }
+
+        public Entity(string name, int damage)
+        {
+            Name = name;
+            Damage = damage;
+        }
+        public virtual void Damaged(string name, int damage)
+        {
+            Console.WriteLine($"{Name}은 {name}에게 {damage}만큼의 데미지를 받았다!!");
+        }
+
+    }
+
+    internal class Cocoa : Entity
+    {
+        public Cocoa(string name ,int damage) : base (name, damage) { }
+
+        public override void Damaged(string name, int damage)
+        {
+            base.Damaged(name, damage);
+        }
+        
+    }
+
+    internal class SuperStone : Entity
+    {
+        public SuperStone(string name, int damage) : base (name, damage) { }
+        public override void Damaged(string name, int damage)
+        {
+            Console.WriteLine($"{Name}은 데미지를 받지 않는다!! {name}의 {damage}만큼의 데미지가 무시되었다!!");
+        }
+    }
+
+    internal class DamagedManager
+    {
+        private static DamagedManager m_instance;
+        private DamagedManager() { }
+        public static DamagedManager Instance
+        {
+            get
+            {
+                if(m_instance == null)
+                {
+                    m_instance = new DamagedManager();
+                }
+                return m_instance;
+            }
+        }
+
+        public void Attack(string attacker, int damage, Action<string, int> defenderAction)
+        {
+            Console.WriteLine("공격을 하시겠습니까?");
+            Console.WriteLine("예 = Y / 아니오 = 그 외");
+            string choice = Console.ReadLine();
+
+            choice = choice.ToLower();
+
+            if (choice == "y")
+            {
+                defenderAction?.Invoke(attacker, damage);
+                return;
+            }
+
+            EntityNoDamaged();
+            
+        }
+
+        public void EntityNoDamaged()
+        {
+            Console.WriteLine("데미지를 받지 않았다!!");
+        }
+    }
+
     internal class Program
     {
-        class BubbleSort
+        static void Main(string[] leeKiWoong)
         {
-            public static void Bubble(int[] sequence)
-            {
-                int TradeNumber = 0;
+            Cocoa goodCocoa = new Cocoa("코코아", 10);
+            SuperStone BadSuperStone = new SuperStone("무적돌", 500);
 
-                for (int j = 0; j < sequence.Length - 1; j++)
-                {
-                    for (int i = 0; i < sequence.Length - 1; i++)
-                    {
+            DamagedManager.Instance.Attack(BadSuperStone.Name, BadSuperStone.Damage, goodCocoa.Damaged);
+            DamagedManager.Instance.Attack(goodCocoa.Name, goodCocoa.Damage, BadSuperStone.Damaged);
 
-                        int FirstNumber = sequence[i];
-                        int SecondNumber = sequence[i + 1];
-                        int SaveNumber = SecondNumber;
-
-                        if (FirstNumber > SecondNumber)
-                        {
-                            TradeNumber++;
-                            SecondNumber = FirstNumber;
-                            FirstNumber = SaveNumber;
-                            sequence[i] = FirstNumber;
-                            sequence[i + 1] = SecondNumber;
-                        }
-                    }
-                }
-
-                Console.WriteLine($"교환 횟수 = {TradeNumber}");
-            }
-        }
-
-        internal class SelectionSort
-        {
-            public static void Selection(int[] sequence)
-            {
-                int TradeNumber = 0;
-
-                for (int j = 0; j < sequence.Length - 1; j++)
-                {
-                    int lowNumber = sequence[j];
-                    int choiceNumber = j;
-
-                    for (int i = j; i < sequence.Length; i++)
-                    {
-                        if (sequence[i] < lowNumber)
-                        {
-                            lowNumber = sequence[i];
-                            choiceNumber = i;
-                        }
-                    }
-
-                    TradeNumber++;
-                    sequence[choiceNumber] = sequence[j];
-                    sequence[j] = lowNumber;
-                }
-                Console.WriteLine($"교환 횟수 = {TradeNumber}");
-
-            }
-        }
-
-        internal class InsertionSort
-        {
-            public static void Insertion(int[] sequence)
-            {
-                int tradeNumber = 0;
-
-                for (int j = 1; j < sequence.Length; j++)
-                {
-                    int insertNumber = sequence[j];
-                    int length = j;
-
-                    for (int i = j - 1; i >= 0; i--)
-                    {
-                        int checkNumber = sequence[i];
-
-
-                        if (insertNumber < checkNumber)
-                        {
-                            sequence[i + 1] = checkNumber;
-                            length = i;
-                        }
-                        else break;
-                    }
-
-                    tradeNumber++;
-                    sequence[length] = insertNumber;
-                }
-                Console.WriteLine($"교환 횟수 = {tradeNumber}");
-            }
-        }
-
-        static void Main(string[] leekiwoong)
-        {
-            int[] sortOne = new int[20] { 17, 1, 3, 9, 13, 4, 19, 7, 16, 14, 20, 6, 5, 10, 12, 18, 2, 15, 8, 11 };
-
-
-            //BubbleSort.Bubble(sortOne);
-
-            //SelectionSort.Selection(sortOne);
-
-            InsertionSort.Insertion(sortOne);
-
-            Console.WriteLine(string.Join(",", sortOne));
 
 
         }
