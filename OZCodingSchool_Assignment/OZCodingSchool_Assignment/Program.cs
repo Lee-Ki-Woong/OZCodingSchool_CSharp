@@ -71,22 +71,30 @@ namespace OZCodingSchool_Assignment
         {
             public static void Insertion(int[] sequence)
             {
+                int tradeNumber = 0;
+
                 for (int j = 1; j < sequence.Length; j++)
                 {
-                    int InsertNumber = sequence[j];
+                    int insertNumber = sequence[j];
+                    int length = j;
 
                     for (int i = j - 1; i >= 0; i--)
                     {
-                        int CheckNumber = sequence[i];
-                        
+                        int checkNumber = sequence[i];
 
-                        if (InsertNumber < CheckNumber)
+
+                        if (insertNumber < checkNumber)
                         {
-                            sequence[i] = InsertNumber;
-                            sequence[i+1] = CheckNumber;
+                            sequence[i + 1] = checkNumber;
+                            length = i;
                         }
+                        else break;
                     }
+
+                    tradeNumber++;
+                    sequence[length] = insertNumber;
                 }
+                Console.WriteLine($"교환 횟수 = {tradeNumber}");
             }
         }
 
